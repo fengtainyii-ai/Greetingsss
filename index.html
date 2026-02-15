@@ -27,7 +27,7 @@
 
         body {
             min-height: 100vh;
-            color: #f0f0ff;
+            color: var(--text-color, #f0f0ff);
             font-family: system-ui, -apple-system, sans-serif;
             transition: background 2.5s ease, color 1.8s ease;
             overflow-x: hidden;
@@ -35,16 +35,17 @@
         }
 
 
+
         body::after {
             content: "";
             position: fixed;
             inset: 0;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" opacity="0.07"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="5" /><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.6"/></svg>');
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.04"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/></filter><rect width="100%" height="100%" filter="url(%23n)"/></svg>');
             pointer-events: none;
-            z-index: -1;
-            mix-blend-mode: overlay;
-            opacity: 0.65;
+            z-index: 100;
+            opacity: 0.4;
         }
+
 
         .container {
             min-height: 100vh;
@@ -61,7 +62,6 @@
 
         .greeting {
             font-size: clamp(2.2rem, 9vw, 6rem);
-
             font-weight: 800;
             text-align: center;
             letter-spacing: -0.03em;
@@ -69,17 +69,19 @@
             opacity: 0;
             transform: translateY(50px);
             animation: fadeInUp 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
         .from {
             font-size: clamp(1.2rem, 4vw, 2.2rem);
-
             opacity: 0.9;
             font-weight: 400;
             letter-spacing: 0.05em;
             margin-top: 1rem;
             animation: fadeIn 2.2s 0.7s ease-out forwards;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
+
 
         .glow-text {
             background: var(--gradient-colors, #a78bfa);
@@ -170,45 +172,102 @@
 
         /* Weather Card */
         .weather-card {
-            margin-top: 2.5rem;
-            padding: 1.2rem 1.8rem;
-            background: rgba(20, 20, 40, 0.65);
-            border-radius: 20px;
-            border: 1px solid rgba(140, 140, 200, 0.25);
-            backdrop-filter: blur(10px);
+            margin-top: 2rem;
+            padding: 1.5rem 2rem;
+            background: var(--card-bg, rgba(255, 255, 255, 0.05));
+            color: var(--card-text, #ffffff);
+            backdrop-filter: blur(25px) saturate(150%);
+            -webkit-backdrop-filter: blur(25px) saturate(150%);
+            border: 1px solid var(--card-border, rgba(255, 255, 255, 0.12));
+            border-radius: 32px;
             text-align: center;
-            max-width: 320px;
+            max-width: 380px;
+            width: 90%;
             opacity: 0;
             transform: translateY(30px);
-            transition: all 1s ease-out;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            perspective: 1000px;
+            touch-action: manipulation;
         }
+
 
         .weather-card.visible {
             opacity: 1;
             transform: translateY(0);
         }
 
+        .weather-card:hover {
+            transform: translateY(-10px) rotateX(8deg) rotateY(-8deg);
+            border-color: var(--accent);
+            box-shadow: 0 25px 55px rgba(0, 0, 0, 0.2), 0 0 25px var(--glow-color2);
+        }
+
+        /* Pro View Style (Toggled on Click) */
+        .weather-card.pro-view {
+            background: linear-gradient(135deg, rgba(238, 242, 243, 0.1), rgba(142, 158, 171, 0.1));
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 35px 75px rgba(0, 0, 0, 0.3), 0 0 30px var(--accent);
+        }
+
+        .weather-card.pro-view::after {
+            content: "PRO EDITION";
+            position: absolute;
+            top: 12px;
+            right: 20px;
+            font-size: 0.6rem;
+            font-weight: 900;
+            color: var(--accent);
+            letter-spacing: 0.15em;
+            opacity: 0.7;
+        }
+
+        .weather-card .inner-glow {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, var(--accent), transparent 75%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .weather-card:hover .inner-glow {
+            opacity: 0.1;
+        }
+
         .weather-icon {
-            font-size: 3.2rem;
-            margin-bottom: 0.6rem;
+            font-size: 3.8rem;
+            margin-bottom: 0.4rem;
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.2));
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .weather-card:hover .weather-icon {
+            transform: scale(1.2) rotate(5deg);
         }
 
         .weather-temp {
-            font-size: 2.4rem;
-            font-weight: 700;
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
         }
 
         .weather-desc {
             font-size: 1.2rem;
-            opacity: 0.9;
-            margin: 0.4rem 0;
+            font-weight: 600;
+            opacity: 0.95;
+            margin-bottom: 0.5rem;
         }
 
         .weather-info {
-            font-size: 1rem;
-            opacity: 0.8;
+            font-size: 0.95rem;
+            opacity: 0.7;
+            line-height: 1.5;
         }
+
 
         /* ✅ NEW: Avatar Cards (Rothaa + Dara) */
         .avatar-row {
@@ -258,18 +317,20 @@
             align-items: center;
             gap: 1rem;
             padding: 1rem;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3);
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(30px) saturate(160%);
+            -webkit-backdrop-filter: blur(30px) saturate(160%);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
             position: relative;
             overflow: hidden;
             perspective: 1000px;
             -webkit-tap-highlight-color: transparent;
         }
+
+
 
         /* Mobile Touch State */
         .avatar-card:active {
@@ -349,11 +410,12 @@
             font-size: 1.25rem;
             font-weight: 800;
             letter-spacing: -0.01em;
-            color: #ffffff;
+            color: var(--card-text, #ffffff);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
 
         .avatar-sub {
             font-size: 0.95rem;
@@ -366,16 +428,58 @@
 
         .avatar-action {
             margin-top: 0.4rem;
-            font-size: 0.8rem;
-            font-weight: 600;
+            font-size: 0.75rem;
+            font-weight: 700;
             color: var(--accent);
             opacity: 0.8;
             display: flex;
             align-items: center;
             gap: 0.4rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
         }
+
+        /* Relationship Mode Visuals */
+        .avatar-card.holding {
+            transform: scale(1.05) translateY(-10px) rotateX(10deg);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px var(--accent);
+            border-color: #ff4d6d;
+            background: rgba(255, 77, 109, 0.1);
+        }
+
+        .avatar-card.holding .avatar {
+            border-color: #ff4d6d;
+            box-shadow: 0 0 30px #ff4d6d;
+            animation: avatarPulse 0.4s infinite alternate;
+        }
+
+        .avatar-card .heart-icon {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            color: #ff4d6d;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 0 5px #ff4d6d);
+        }
+
+        .avatar-card.holding .heart-icon {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        @keyframes avatarPulse {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.15);
+            }
+        }
+
 
 
         @keyframes fadeInUp {
@@ -398,14 +502,6 @@
         }
 
         @media (max-width: 520px) {
-            .buttons {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .btn {
-                width: min(300px, 90%);
-            }
 
             .weather-card {
                 padding: 1rem;
@@ -442,44 +538,90 @@
 
         /* Time-of-day themes */
         body.morning {
-            background: linear-gradient(to bottom, #0f1f47, #1e3a5f, #ff9a8b 60%, #fad0c4);
-            --gradient-colors: #ff9a8b, #fec49a, #ffd1a4, #ff9a8b;
-            --glow-color: rgba(255, 140, 100, 0.75);
-            --glow-color2: rgba(255, 210, 140, 0.5);
-            --accent: #ff8c66;
-            --btn-start: #ffab91;
-            --btn-end: #ff7043;
+            background: linear-gradient(135deg, #2c3e50, #4ca1af, #f8f9fa);
+            --text-color: #ffffff;
+            --gradient-colors: #e9ecef, #adb5bd, #e9ecef, #adb5bd;
+            --glow-color: rgba(255, 255, 255, 0.4);
+            --glow-color2: rgba(76, 161, 175, 0.2);
+            --accent: #ffffff;
+            --btn-start: #4ca1af;
+            --btn-end: #2c3e50;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-text: #ffffff;
+            --card-border: rgba(255, 255, 255, 0.12);
         }
+
 
         body.afternoon {
-            background: linear-gradient(to bottom, #4a90e2, #81d4fa, #b3e5fc, #e1f5fe);
-            --gradient-colors: #4a90e2, #81d4fa, #b3e5fc, #4a90e2;
-            --glow-color: rgba(100, 180, 255, 0.8);
-            --glow-color2: rgba(150, 220, 255, 0.45);
-            --accent: #64b5f6;
-            --btn-start: #81d4fa;
-            --btn-end: #4fc3f7;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            --text-color: #2c3e50;
+            --gradient-colors: #2c3e50, #4ca1af, #2c3e50, #4ca1af;
+            --glow-color: rgba(44, 62, 80, 0.15);
+            --glow-color2: rgba(76, 161, 175, 0.2);
+            --accent: #2c3e50;
+            --btn-start: #4ca1af;
+            --btn-end: #2c3e50;
+            --card-bg: rgba(255, 255, 255, 0.45);
+            --card-text: #1a2a3a;
+            --card-border: rgba(255, 255, 255, 0.8);
         }
 
+        body.afternoon .greeting,
+        body.afternoon .from {
+            color: #2c3e50;
+            text-shadow: 0 5px 15px rgba(255, 255, 255, 0.4);
+        }
+
+        body.afternoon .avatar-card,
+        body.afternoon .weather-card {
+            background: var(--card-bg);
+            border-color: var(--card-border);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+        }
+
+
+        body.afternoon .avatar-title,
+        body.afternoon .weather-temp,
+        body.afternoon .weather-desc {
+            color: #1a2a3a;
+        }
+
+        body.afternoon .avatar-sub,
+        body.afternoon .weather-info {
+            color: #4a5a6a;
+        }
+
+
         body.evening {
-            background: linear-gradient(to bottom, #2c0b3f, #4a148c, #7b1fa2, #f06292 70%);
-            --gradient-colors: #f06292, #ba68c8, #9575cd, #f06292;
-            --glow-color: rgba(240, 98, 146, 0.8);
-            --glow-color2: rgba(186, 104, 200, 0.55);
-            --accent: #f06292;
-            --btn-start: #ba68c8;
-            --btn-end: #ab47bc;
+            background: linear-gradient(135deg, #141e30, #243b55, #4b6cb7);
+            --text-color: #ffffff;
+            --gradient-colors: #4b6cb7, #182848, #4b6cb7, #182848;
+            --glow-color: rgba(75, 108, 183, 0.6);
+            --glow-color2: rgba(36, 59, 85, 0.4);
+            --accent: #4b6cb7;
+            --btn-start: #243b55;
+            --btn-end: #141e30;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-text: #ffffff;
+            --card-border: rgba(255, 255, 255, 0.12);
         }
 
         body.night {
-            background: linear-gradient(to bottom, #0a001f, #1a0033, #2e0047, #0a001f);
-            --gradient-colors: #a78bfa, #7dd3fc, #c084fc, #a78bfa;
-            --glow-color: rgba(167, 139, 250, 0.8);
-            --glow-color2: rgba(125, 211, 252, 0.5);
-            --accent: #c084fc;
-            --btn-start: #7e57c2;
-            --btn-end: #5e35b1;
+            background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+            --text-color: #f0f0ff;
+            --gradient-colors: #adb5bd, #ced4da, #adb5bd, #ced4da;
+            --glow-color: rgba(173, 181, 189, 0.5);
+            --glow-color2: rgba(44, 83, 100, 0.3);
+            --accent: #adb5bd;
+            --btn-start: #203a43;
+            --btn-end: #0f2027;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-text: #ffffff;
+            --card-border: rgba(255, 255, 255, 0.12);
         }
+
+
+
 
         /* Weather-specific overrides */
         body.rainy {
@@ -527,34 +669,39 @@
 
         <!-- Weather Card -->
         <div class="weather-card" id="weatherCard">
+            <div class="inner-glow"></div>
             <div class="weather-icon" id="weatherIcon">⛅</div>
             <div class="weather-temp" id="weatherTemp">--°C</div>
-            <div class="weather-desc" id="weatherDesc">Loading weather...</div>
-            <div class="weather-info">
+            <div class="weather-desc" id="weatherDesc">Loading...</div>
+            <div class="weather-info" id="weatherInfo">
                 Feels like: <span id="feelsLike">--°C</span> | Humidity: <span id="humidity">--%</span><br>
-                Wind: <span id="wind">-- km/h</span>
+                Wind Speed: <span id="wind">-- km/h</span>
             </div>
         </div>
 
+
         <!-- ✅ NEW: Two Image Cards -->
         <div class="avatar-row" id="avatarRow">
-            <div class="avatar-card" id="rothaaCard" title="Replace image URL in JS">
+            <div class="avatar-card" id="rothaaCard">
                 <img class="avatar" id="rothaaImg" src="" alt="Rothaa" />
                 <div class="avatar-meta">
                     <div class="avatar-title">Rothaa</div>
-                    <div class="avatar-sub"><i class="fa-solid fa-wand-magic-sparkles"></i> Your spotlight card</div>
+                    <div class="avatar-sub"><i class="fa-solid fa-wand-magic-sparkles"></i> Spotlight Card</div>
                 </div>
-                <div class="avatar-action"><i class="fa-solid fa-link"></i> Image URL</div>
+                <div class="avatar-action">Hold to Heart</div>
+                <i class="fa-solid fa-heart heart-icon"></i>
             </div>
 
-            <div class="avatar-card" id="daraCard" title="Replace image URL in JS">
+            <div class="avatar-card" id="daraCard">
                 <img class="avatar" id="daraImg" src="" alt="Dara" />
                 <div class="avatar-meta">
                     <div class="avatar-title">Dara</div>
-                    <div class="avatar-sub"><i class="fa-solid fa-heart"></i> Sender card</div>
+                    <div class="avatar-sub"><i class="fa-solid fa-heart"></i> Sender Card</div>
                 </div>
-                <div class="avatar-action"><i class="fa-solid fa-link"></i> Image URL</div>
+                <div class="avatar-action">Hold to Heart</div>
+                <i class="fa-solid fa-heart heart-icon"></i>
             </div>
+
         </div>
 
     </div>
@@ -590,15 +737,53 @@
         rothaaImg.src = PROFILE_IMAGES.rothaa;
         daraImg.src = PROFILE_IMAGES.dara;
 
-        // Optional: click card to quickly change via prompt (simple UX)
-        document.getElementById("rothaaCard").addEventListener("click", () => {
-            const u = prompt("Paste Rothaa image URL:", rothaaImg.src);
-            if (u) rothaaImg.src = u.trim();
+        // Hold mechanism for Love Preview
+        let holdTimer;
+        let isHolding = false;
+
+        function startHold(card) {
+            isHolding = true;
+            card.classList.add('holding');
+            window.isLoveMode = true;
+        }
+
+        function endHold() {
+            isHolding = false;
+            document.querySelectorAll('.avatar-card').forEach(c => c.classList.remove('holding'));
+            window.isLoveMode = false;
+        }
+
+        document.querySelectorAll('.avatar-card').forEach(card => {
+            card.addEventListener('mousedown', () => startHold(card));
+            card.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                startHold(card);
+            });
+
+            card.addEventListener('mouseup', endHold);
+            card.addEventListener('mouseleave', endHold);
+            card.addEventListener('touchend', endHold);
+            card.addEventListener('touchcancel', endHold);
+
+            // Double click to change image (UX improvement)
+            card.addEventListener('dblclick', () => {
+                const img = card.querySelector('.avatar');
+                const u = prompt("Paste new profile image URL:", img.src);
+                if (u) img.src = u.trim();
+            });
         });
-        document.getElementById("daraCard").addEventListener("click", () => {
-            const u = prompt("Paste Dara image URL:", daraImg.src);
-            if (u) daraImg.src = u.trim();
+
+        // Weather Card Toggle
+        const weatherCardEl = document.getElementById('weatherCard');
+        weatherCardEl.addEventListener('click', () => {
+            weatherCardEl.classList.toggle('pro-view');
+            // Micro-feedback haptic/sound feel
+            const icon = weatherCardEl.querySelector('.weather-icon');
+            icon.style.transform = 'scale(0.8)';
+            setTimeout(() => icon.style.transform = '', 200);
         });
+
+
 
         // ─── Weather Integration (Open-Meteo - no key needed) ────────────────
         const weatherCard = document.getElementById('weatherCard');
@@ -711,6 +896,11 @@
                 if (this.y > h + 60 || (!this.isRain && this.age >= this.life)) this.reset();
             }
             draw() {
+                if (window.isLoveMode) {
+                    this.drawHeart();
+                    return;
+                }
+
                 const hue = getComputedStyle(document.body).getPropertyValue('--accent')?.match(/\d+/)?.[0] || 270;
                 ctx.globalAlpha = this.opacity * 0.95;
                 ctx.fillStyle = this.isRain ? '#ffffff' : `hsl(${parseInt(hue) + this.hueOffset}, 85%, 75%)`;
@@ -730,6 +920,15 @@
                     ctx.globalAlpha = this.opacity * 0.3; ctx.shadowBlur = 30; ctx.fill();
                 }
             }
+
+            drawHeart() {
+                const size = this.size * 5;
+                ctx.globalAlpha = this.opacity * 0.8;
+                ctx.fillStyle = `rgba(255, 77, 109, ${this.opacity})`;
+                ctx.font = `${size}px serif`;
+                ctx.fillText('❤', this.x, this.y);
+            }
+
 
         }
         for (let i = 0; i < count; i++) particles.push(new Particle());
