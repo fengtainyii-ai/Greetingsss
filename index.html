@@ -13,6 +13,8 @@
     <meta property="og:image" content="https://i.imgur.com/ezkzXMn.jpeg" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0a001f" />
+
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
@@ -80,14 +82,16 @@
         }
 
         .glow-text {
-            background: linear-gradient(90deg, var(--gradient-colors));
+            background: var(--gradient-colors, #a78bfa);
+            background: linear-gradient(90deg, var(--gradient-colors, #a78bfa, #7dd3fc, #c084fc, #a78bfa));
             background-size: 300% 100%;
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 30px var(--glow-color)) drop-shadow(0 0 60px var(--glow-color2));
+            filter: drop-shadow(0 0 30px var(--glow-color, rgba(167, 139, 250, 0.5))) drop-shadow(0 0 60px var(--glow-color2, rgba(125, 211, 252, 0.3)));
             animation: glowBreath 7s ease-in-out infinite, hueRotate 16s linear infinite;
         }
+
 
         @keyframes glowBreath {
 
@@ -224,54 +228,115 @@
             transform: translateY(0);
         }
 
+        .avatar-row.visible .avatar-card {
+            animation: cardPopIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            opacity: 0;
+        }
+
+        .avatar-row.visible .avatar-card:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+
+        .avatar-row.visible .avatar-card:nth-child(2) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes cardPopIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
         .avatar-card {
             display: flex;
             align-items: center;
             gap: 1rem;
-            padding: 1rem 1.1rem;
+            padding: 1rem;
             border-radius: 20px;
-            border: 1px solid rgba(140, 140, 200, 0.22);
-            background: rgba(20, 20, 40, 0.55);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 10px 34px rgba(0, 0, 0, 0.42);
-            transition: transform .45s cubic-bezier(.23, 1, .32, 1), box-shadow .45s cubic-bezier(.23, 1, .32, 1), border-color .45s ease;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             position: relative;
             overflow: hidden;
+            perspective: 1000px;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .avatar-card::before {
+        /* Mobile Touch State */
+        .avatar-card:active {
+            transform: scale(0.96) translateY(2px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent);
+        }
+
+
+        /* Shimmer Effect */
+        .avatar-card::after {
             content: "";
             position: absolute;
-            inset: -40%;
-            background:
-                radial-gradient(closest-side, rgba(255, 255, 255, .10), transparent 70%),
-                radial-gradient(closest-side, rgba(192, 132, 252, .14), transparent 68%);
-            transform: translateX(-20%);
-            opacity: .9;
-            pointer-events: none;
-            transition: transform 1.2s ease;
+            top: 0;
+            left: -150%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.1),
+                    transparent);
+            transform: skewX(-20deg);
+            transition: 0.7s;
+        }
+
+        .avatar-card:hover::after {
+            left: 150%;
         }
 
         .avatar-card:hover {
-            transform: translateY(-6px) scale(1.02);
+            transform: translateY(-8px) rotateX(4deg) rotateY(-4deg);
             border-color: var(--accent);
-            box-shadow: 0 16px 52px rgba(0, 0, 0, 0.52), 0 0 40px rgba(192, 132, 252, 0.16);
+            background: rgba(255, 255, 255, 0.07);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 20px var(--glow-color2);
         }
 
-        .avatar-card:hover::before {
-            transform: translateX(20%);
-        }
 
         .avatar {
-            width: 64px;
-            height: 64px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.14);
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05), 0 0 38px var(--glow-color2);
+            border: 3px solid rgba(255, 255, 255, 0.2);
             object-fit: cover;
             flex: 0 0 auto;
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.5s ease;
+            animation: avatarGlow 3s infinite alternate;
         }
+
+        .avatar-card:hover .avatar {
+            transform: scale(1.1) rotate(5deg);
+            border-color: var(--accent);
+            box-shadow: 0 0 25px var(--accent);
+        }
+
+        @keyframes avatarGlow {
+            from {
+                box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+            }
+
+            to {
+                box-shadow: 0 0 20px var(--glow-color2);
+            }
+        }
+
 
         .avatar-meta {
             display: flex;
@@ -281,38 +346,37 @@
         }
 
         .avatar-title {
-            font-size: 1.05rem;
-            font-weight: 750;
-            letter-spacing: .02em;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            color: #ffffff;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .avatar-sub {
-            font-size: .92rem;
-            opacity: .82;
+            font-size: 0.95rem;
+            opacity: 0.7;
             display: flex;
             align-items: center;
-            gap: .45rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .avatar-sub i {
-            opacity: .9;
+            gap: 0.5rem;
+            line-height: 1.4;
         }
 
         .avatar-action {
-            margin-left: auto;
-            opacity: .78;
-            font-size: .9rem;
+            margin-top: 0.4rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent);
+            opacity: 0.8;
             display: flex;
             align-items: center;
-            gap: .45rem;
-            white-space: nowrap;
+            gap: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
+
 
         @keyframes fadeInUp {
             to {
@@ -343,7 +407,6 @@
                 width: min(300px, 90%);
             }
 
-
             .weather-card {
                 padding: 1rem;
                 max-width: 95%;
@@ -354,10 +417,28 @@
             }
 
             .avatar-row {
-                gap: 0.8rem;
+                width: 95vw;
+                padding: 0 0.5rem;
+            }
+
+            .avatar-card {
+                padding: 0.85rem;
+                gap: 0.85rem;
+            }
+
+            .avatar {
+                width: 60px;
+                height: 60px;
+            }
+
+            .avatar-title {
+                font-size: 1.1rem;
+            }
+
+            .avatar-sub {
+                font-size: 0.85rem;
             }
         }
-
 
         /* Time-of-day themes */
         body.morning {
@@ -399,7 +480,39 @@
             --btn-start: #7e57c2;
             --btn-end: #5e35b1;
         }
+
+        /* Weather-specific overrides */
+        body.rainy {
+            background: linear-gradient(to bottom, #203a43, #2c5364, #0f2027);
+            --gradient-colors: #4ca1af, #c4e0e5, #4ca1af;
+            --glow-color: rgba(76, 161, 175, 0.7);
+            --glow-color2: rgba(196, 224, 229, 0.4);
+            --accent: #4ca1af;
+            --btn-start: #2c5364;
+            --btn-end: #0f2027;
+        }
+
+        body.cloudy {
+            background: linear-gradient(to bottom, #3e5151, #decba4);
+            --gradient-colors: #8e9eab, #eef2f3, #8e9eab;
+            --glow-color: rgba(142, 158, 171, 0.7);
+            --glow-color2: rgba(238, 242, 243, 0.4);
+            --accent: #8e9eab;
+            --btn-start: #3e5151;
+            --btn-end: #2c3e50;
+        }
+
+        body.stormy {
+            background: linear-gradient(to bottom, #000428, #004e92, #000428);
+            --gradient-colors: #f0f2f0, #000c40, #f0f2f0;
+            --glow-color: rgba(240, 242, 240, 0.8);
+            --glow-color2: rgba(0, 78, 146, 0.6);
+            --accent: #ffffff;
+            --btn-start: #000428;
+            --btn-end: #004e92;
+        }
     </style>
+
 </head>
 
 <body class="night">
@@ -444,13 +557,9 @@
             </div>
         </div>
 
-        <div class="buttons">
-            <button class="btn" data-greeting="Morning">Good Morning</button>
-            <button class="btn" data-greeting="Afternoon">Good Afternoon</button>
-            <button class="btn" data-greeting="Evening">Good Evening</button>
-            <button class="btn active" data-greeting="Night">Good Night</button>
-        </div>
     </div>
+    </div>
+
 
     <script>
         // ─── Time-of-day logic ───────────────────────────────────────────────
@@ -462,8 +571,11 @@
             return "Night";
         }
         function applyTheme(type) {
+            const currentWeather = window.currentWeather || "";
             document.body.className = timeClasses[type];
+            if (currentWeather) document.body.classList.add(currentWeather);
         }
+
 
         // ✅ NEW: Replace these image URLs
         const PROFILE_IMAGES = {
@@ -518,20 +630,32 @@
                 humidityEl.textContent = `${hum}%`;
                 windEl.textContent = `${wind} km/h`;
 
-                // Simple WMO code → icon & description
-                let icon = "🌤️", desc = "Clear";
+                // Simple WMO code → icon & description & theme
+                let icon = "🌤️", desc = "Clear", themeType = "";
                 if (code >= 1 && code <= 3) { icon = isDay ? "☀️" : "🌙"; desc = "Clear"; }
-                else if (code >= 45 && code <= 48) { icon = "🌫️"; desc = "Fog"; }
-                else if (code >= 51 && code <= 67) { icon = "🌧️"; desc = "Rain"; }
-                else if (code >= 71 && code <= 77) { icon = "❄️"; desc = "Snow"; }
-                else if (code >= 80 && code <= 86) { icon = "🌦️"; desc = "Showers"; }
-                else if (code >= 95) { icon = "⛈️"; desc = "Thunderstorm"; }
-                else { icon = isDay ? "⛅" : "🌥️"; desc = "Cloudy"; }
+                else if (code >= 45 && code <= 48) { icon = "🌫️"; desc = "Fog"; themeType = "cloudy"; }
+                else if (code >= 51 && code <= 61) { icon = "🌧️"; desc = "Light Rain"; themeType = "rainy"; }
+                else if (code >= 63 && code <= 67) { icon = "🌧️"; desc = "Rain"; themeType = "rainy"; }
+                else if (code >= 71 && code <= 77) { icon = "❄️"; desc = "Snow"; themeType = "rainy"; }
+                else if (code >= 80 && code <= 82) { icon = "🌦️"; desc = "Showers"; themeType = "rainy"; }
+                else if (code >= 85 && code <= 86) { icon = "🌨️"; desc = "Snow Showers"; themeType = "rainy"; }
+                else if (code >= 95) { icon = "⛈️"; desc = "Thunderstorm"; themeType = "stormy"; }
+                else { icon = isDay ? "⛅" : "🌥️"; desc = "Cloudy"; themeType = "cloudy"; }
 
                 weatherIcon.textContent = icon;
                 weatherDesc.textContent = desc;
 
+                // Set global weather state
+                window.currentWeather = themeType;
+                window.currentWeatherDesc = desc;
+
+                // Sync greeting & theme
+                const timeType = getTimeOfDay();
+                setGreeting(timeType);
+
+
                 // reveal cards with nice timing
+
                 weatherCard.classList.add('visible');
                 setTimeout(() => avatarRow.classList.add("visible"), 220);
 
@@ -561,29 +685,52 @@
             constructor() { this.reset(); }
             reset() {
                 this.x = Math.random() * w;
-                this.y = Math.random() * h * 1.4 - h * 0.4;
-                this.size = Math.random() * 3 + 0.8;
-                this.speed = Math.random() * 0.5 + 0.2;
-                this.opacity = Math.random() * 0.5 + 0.25;
+                this.y = Math.random() * h * 1.5 - h * 0.5;
+                this.isRain = window.currentWeather === 'rainy' || window.currentWeather === 'stormy';
+
+                if (this.isRain) {
+                    this.size = Math.random() * 1.5 + 0.5;
+                    this.speed = Math.random() * 8 + 12;
+                    this.opacity = Math.random() * 0.3 + 0.1;
+                } else {
+                    this.size = Math.random() * 3 + 0.8;
+                    this.speed = Math.random() * 0.5 + 0.2;
+                    this.opacity = Math.random() * 0.5 + 0.25;
+                }
+
                 this.hueOffset = Math.random() * 40 - 20;
                 this.life = Math.random() * 400 + 500;
                 this.age = 0;
             }
             update() {
                 this.y += this.speed;
-                this.age++;
-                this.opacity = 0.75 * Math.sin((this.age / this.life) * Math.PI);
-                if (this.y > h + 60 || this.age >= this.life) this.reset();
+                if (!this.isRain) {
+                    this.age++;
+                    this.opacity = 0.75 * Math.sin((this.age / this.life) * Math.PI);
+                }
+                if (this.y > h + 60 || (!this.isRain && this.age >= this.life)) this.reset();
             }
             draw() {
                 const hue = getComputedStyle(document.body).getPropertyValue('--accent')?.match(/\d+/)?.[0] || 270;
                 ctx.globalAlpha = this.opacity * 0.95;
-                ctx.fillStyle = `hsl(${parseInt(hue) + this.hueOffset}, 85%, 75%)`;
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = `hsl(${parseInt(hue) + this.hueOffset}, 90%, 65%)`;
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
-                ctx.globalAlpha = this.opacity * 0.3; ctx.shadowBlur = 30; ctx.fill();
+                ctx.fillStyle = this.isRain ? '#ffffff' : `hsl(${parseInt(hue) + this.hueOffset}, 85%, 75%)`;
+
+                if (this.isRain) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y);
+                    ctx.lineTo(this.x, this.y + 15);
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                    ctx.lineWidth = this.size;
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+                } else {
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = `hsl(${parseInt(hue) + this.hueOffset}, 90%, 65%)`;
+                    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+                    ctx.globalAlpha = this.opacity * 0.3; ctx.shadowBlur = 30; ctx.fill();
+                }
             }
+
         }
         for (let i = 0; i < count; i++) particles.push(new Particle());
 
@@ -603,26 +750,24 @@
         const buttons = document.querySelectorAll('.btn');
 
         const greetings = { Morning: "Morning", Afternoon: "Afternoon", Evening: "Evening", Night: "Night" };
+        const weatherWords = { "Clear": "Bright", "Rain": "Rainy", "Light Rain": "Rainy", "Cloudy": "Cloudy", "Fog": "Misty", "Thunderstorm": "Stormy" };
 
         function setGreeting(type) {
             greetingText.style.animation = 'none';
             void greetingText.offsetWidth;
-            greetingText.style.animation = 'fadeInUp 1.3s cubic-bezier(0.22,1,0.36,1)';
+            greetingText.style.animation = 'fadeInUp 1.3s cubic-bezier(0.22,1,0.36,1) forwards';
 
-            timeWord.textContent = greetings[type];
+            const wWord = weatherWords[window.currentWeatherDesc] || "";
+            timeWord.textContent = wWord ? `${wWord} ${greetings[type]}` : greetings[type];
             applyTheme(type);
-
-            buttons.forEach(b => b.classList.remove('active'));
-            document.querySelector(`[data-greeting="${type}"]`).classList.add('active');
         }
 
-        buttons.forEach(btn => {
-            btn.addEventListener('click', () => setGreeting(btn.dataset.greeting));
-        });
+
 
         // Initial setup
         const initialType = getTimeOfDay();
         setGreeting(initialType);
+
     </script>
 </body>
 
