@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Greeting - Rothaa from Dara ✨</title>
+
+    <!-- Social Media Link Previews (Open Graph) -->
+    <meta property="og:title" content="A Special Greeting for Rothaa ✨" />
+    <meta property="og:description"
+        content="A personalized greeting with real-time weather and a beautiful interactive design." />
+    <meta property="og:image" content="https://i.imgur.com/ezkzXMn.jpeg" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            color: #f0f0ff;
+            font-family: system-ui, -apple-system, sans-serif;
+            transition: background 2.5s ease, color 1.8s ease;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" opacity="0.07"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="5" /><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.6"/></svg>');
+            pointer-events: none;
+            z-index: -1;
+            mix-blend-mode: overlay;
+            opacity: 0.65;
+        }
+
+        .container {
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+
+        .greeting {
+            font-size: clamp(2.2rem, 9vw, 6rem);
+
+            font-weight: 800;
+            text-align: center;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.8rem;
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeInUp 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .from {
+            font-size: clamp(1.2rem, 4vw, 2.2rem);
+
+            opacity: 0.9;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            margin-top: 1rem;
+            animation: fadeIn 2.2s 0.7s ease-out forwards;
+        }
+
+        .glow-text {
+            background: linear-gradient(90deg, var(--gradient-colors));
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 30px var(--glow-color)) drop-shadow(0 0 60px var(--glow-color2));
+            animation: glowBreath 7s ease-in-out infinite, hueRotate 16s linear infinite;
+        }
+
+        @keyframes glowBreath {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 25px var(--glow-color)) drop-shadow(0 0 50px var(--glow-color2));
+            }
+
+            50% {
+                filter: drop-shadow(0 0 50px var(--glow-color)) drop-shadow(0 0 100px var(--glow-color2));
+            }
+        }
+
+        @keyframes hueRotate {
+            to {
+                filter: hue-rotate(360deg);
+            }
+        }
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            margin-top: 2.4rem;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .btn {
+            padding: 1rem 2.2rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+            background: rgba(35, 35, 55, 0.65);
+            border: 1px solid rgba(140, 120, 200, 0.35);
+            border-radius: 999px;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px) scale(1.06);
+            border-color: var(--accent);
+            box-shadow: 0 0 40px rgba(192, 132, 252, 0.3);
+        }
+
+        .btn.active {
+            background: linear-gradient(135deg, var(--btn-start), var(--btn-end));
+            border-color: var(--accent);
+            box-shadow: 0 0 45px var(--glow-color);
+        }
+
+        .btn::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+            transform: translateX(-120%);
+            transition: transform 0.8s ease;
+        }
+
+        .btn:hover::before {
+            transform: translateX(120%);
+        }
+
+        canvas#particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity 1.8s ease;
+        }
+
+        /* Weather Card */
+        .weather-card {
+            margin-top: 2.5rem;
+            padding: 1.2rem 1.8rem;
+            background: rgba(20, 20, 40, 0.65);
+            border-radius: 20px;
+            border: 1px solid rgba(140, 140, 200, 0.25);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            max-width: 320px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease-out;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .weather-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .weather-icon {
+            font-size: 3.2rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .weather-temp {
+            font-size: 2.4rem;
+            font-weight: 700;
+        }
+
+        .weather-desc {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin: 0.4rem 0;
+        }
+
+        .weather-info {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        /* ✅ NEW: Avatar Cards (Rothaa + Dara) */
+        .avatar-row {
+            width: min(760px, 92vw);
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+            margin-top: 1.2rem;
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(26px);
+            transition: all 1s ease-out;
+        }
+
+        .avatar-row.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .avatar-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.1rem;
+            border-radius: 20px;
+            border: 1px solid rgba(140, 140, 200, 0.22);
+            background: rgba(20, 20, 40, 0.55);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 34px rgba(0, 0, 0, 0.42);
+            transition: transform .45s cubic-bezier(.23, 1, .32, 1), box-shadow .45s cubic-bezier(.23, 1, .32, 1), border-color .45s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-card::before {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background:
+                radial-gradient(closest-side, rgba(255, 255, 255, .10), transparent 70%),
+                radial-gradient(closest-side, rgba(192, 132, 252, .14), transparent 68%);
+            transform: translateX(-20%);
+            opacity: .9;
+            pointer-events: none;
+            transition: transform 1.2s ease;
+        }
+
+        .avatar-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: var(--accent);
+            box-shadow: 0 16px 52px rgba(0, 0, 0, 0.52), 0 0 40px rgba(192, 132, 252, 0.16);
+        }
+
+        .avatar-card:hover::before {
+            transform: translateX(20%);
+        }
+
+        .avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05), 0 0 38px var(--glow-color2);
+            object-fit: cover;
+            flex: 0 0 auto;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .avatar-meta {
+            display: flex;
+            flex-direction: column;
+            gap: .2rem;
+            min-width: 0;
+        }
+
+        .avatar-title {
+            font-size: 1.05rem;
+            font-weight: 750;
+            letter-spacing: .02em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .avatar-sub {
+            font-size: .92rem;
+            opacity: .82;
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .avatar-sub i {
+            opacity: .9;
+        }
+
+        .avatar-action {
+            margin-left: auto;
+            opacity: .78;
+            font-size: .9rem;
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+            white-space: nowrap;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 0.9;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .avatar-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: min(300px, 90%);
+            }
+
+
+            .weather-card {
+                padding: 1rem;
+                max-width: 95%;
+            }
+
+            .container {
+                padding: 1rem 0.5rem;
+            }
+
+            .avatar-row {
+                gap: 0.8rem;
+            }
+        }
+
+
+        /* Time-of-day themes */
+        body.morning {
+            background: linear-gradient(to bottom, #0f1f47, #1e3a5f, #ff9a8b 60%, #fad0c4);
+            --gradient-colors: #ff9a8b, #fec49a, #ffd1a4, #ff9a8b;
+            --glow-color: rgba(255, 140, 100, 0.75);
+            --glow-color2: rgba(255, 210, 140, 0.5);
+            --accent: #ff8c66;
+            --btn-start: #ffab91;
+            --btn-end: #ff7043;
+        }
+
+        body.afternoon {
+            background: linear-gradient(to bottom, #4a90e2, #81d4fa, #b3e5fc, #e1f5fe);
+            --gradient-colors: #4a90e2, #81d4fa, #b3e5fc, #4a90e2;
+            --glow-color: rgba(100, 180, 255, 0.8);
+            --glow-color2: rgba(150, 220, 255, 0.45);
+            --accent: #64b5f6;
+            --btn-start: #81d4fa;
+            --btn-end: #4fc3f7;
+        }
+
+        body.evening {
+            background: linear-gradient(to bottom, #2c0b3f, #4a148c, #7b1fa2, #f06292 70%);
+            --gradient-colors: #f06292, #ba68c8, #9575cd, #f06292;
+            --glow-color: rgba(240, 98, 146, 0.8);
+            --glow-color2: rgba(186, 104, 200, 0.55);
+            --accent: #f06292;
+            --btn-start: #ba68c8;
+            --btn-end: #ab47bc;
+        }
+
+        body.night {
+            background: linear-gradient(to bottom, #0a001f, #1a0033, #2e0047, #0a001f);
+            --gradient-colors: #a78bfa, #7dd3fc, #c084fc, #a78bfa;
+            --glow-color: rgba(167, 139, 250, 0.8);
+            --glow-color2: rgba(125, 211, 252, 0.5);
+            --accent: #c084fc;
+            --btn-start: #7e57c2;
+            --btn-end: #5e35b1;
+        }
+    </style>
+</head>
+
+<body class="night">
+    <canvas id="particles"></canvas>
+
+    <div class="container">
+        <div class="greeting" id="greetingText">
+            Good <span class="glow-text" id="timeWord">Morning</span>,<br>Rothaa!
+        </div>
+
+        <div class="from">from Dara ♡</div>
+
+        <!-- Weather Card -->
+        <div class="weather-card" id="weatherCard">
+            <div class="weather-icon" id="weatherIcon">⛅</div>
+            <div class="weather-temp" id="weatherTemp">--°C</div>
+            <div class="weather-desc" id="weatherDesc">Loading weather...</div>
+            <div class="weather-info">
+                Feels like: <span id="feelsLike">--°C</span> | Humidity: <span id="humidity">--%</span><br>
+                Wind: <span id="wind">-- km/h</span>
+            </div>
+        </div>
+
+        <!-- ✅ NEW: Two Image Cards -->
+        <div class="avatar-row" id="avatarRow">
+            <div class="avatar-card" id="rothaaCard" title="Replace image URL in JS">
+                <img class="avatar" id="rothaaImg" src="" alt="Rothaa" />
+                <div class="avatar-meta">
+                    <div class="avatar-title">Rothaa</div>
+                    <div class="avatar-sub"><i class="fa-solid fa-wand-magic-sparkles"></i> Your spotlight card</div>
+                </div>
+                <div class="avatar-action"><i class="fa-solid fa-link"></i> Image URL</div>
+            </div>
+
+            <div class="avatar-card" id="daraCard" title="Replace image URL in JS">
+                <img class="avatar" id="daraImg" src="" alt="Dara" />
+                <div class="avatar-meta">
+                    <div class="avatar-title">Dara</div>
+                    <div class="avatar-sub"><i class="fa-solid fa-heart"></i> Sender card</div>
+                </div>
+                <div class="avatar-action"><i class="fa-solid fa-link"></i> Image URL</div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn" data-greeting="Morning">Good Morning</button>
+            <button class="btn" data-greeting="Afternoon">Good Afternoon</button>
+            <button class="btn" data-greeting="Evening">Good Evening</button>
+            <button class="btn active" data-greeting="Night">Good Night</button>
+        </div>
+    </div>
+
+    <script>
+        // ─── Time-of-day logic ───────────────────────────────────────────────
+        const timeClasses = { Morning: "morning", Afternoon: "afternoon", Evening: "evening", Night: "night" };
+        function getTimeOfDay(hour = new Date().getHours()) {
+            if (hour >= 5 && hour < 11) return "Morning";
+            if (hour >= 11 && hour < 17) return "Afternoon";
+            if (hour >= 17 && hour < 21) return "Evening";
+            return "Night";
+        }
+        function applyTheme(type) {
+            document.body.className = timeClasses[type];
+        }
+
+        // ✅ NEW: Replace these image URLs
+        const PROFILE_IMAGES = {
+            rothaa: "https://i.imgur.com/ezkzXMn.jpeg",
+            dara: "https://i.imgur.com/iF69cwK.jpeg"
+        };
+
+        const rothaaImg = document.getElementById("rothaaImg");
+        const daraImg = document.getElementById("daraImg");
+        const avatarRow = document.getElementById("avatarRow");
+
+        rothaaImg.src = PROFILE_IMAGES.rothaa;
+        daraImg.src = PROFILE_IMAGES.dara;
+
+        // Optional: click card to quickly change via prompt (simple UX)
+        document.getElementById("rothaaCard").addEventListener("click", () => {
+            const u = prompt("Paste Rothaa image URL:", rothaaImg.src);
+            if (u) rothaaImg.src = u.trim();
+        });
+        document.getElementById("daraCard").addEventListener("click", () => {
+            const u = prompt("Paste Dara image URL:", daraImg.src);
+            if (u) daraImg.src = u.trim();
+        });
+
+        // ─── Weather Integration (Open-Meteo - no key needed) ────────────────
+        const weatherCard = document.getElementById('weatherCard');
+        const weatherIcon = document.getElementById('weatherIcon');
+        const weatherTemp = document.getElementById('weatherTemp');
+        const weatherDesc = document.getElementById('weatherDesc');
+        const feelsLikeEl = document.getElementById('feelsLike');
+        const humidityEl = document.getElementById('humidity');
+        const windEl = document.getElementById('wind');
+
+        async function fetchWeather() {
+            try {
+                // Phnom Penh coordinates
+                const url = "https://api.open-meteo.com/v1/forecast?latitude=11.5564&longitude=104.9282&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code,is_day&timezone=Asia%2FBangkok";
+                const res = await fetch(url);
+                if (!res.ok) throw new Error("Weather fetch failed");
+                const data = await res.json();
+                const current = data.current;
+
+                const temp = Math.round(current.temperature_2m);
+                const feels = Math.round(current.apparent_temperature);
+                const hum = current.relative_humidity_2m;
+                const wind = Math.round(current.wind_speed_10m * 3.6); // m/s → km/h
+                const code = current.weather_code;
+                const isDay = current.is_day;
+
+                weatherTemp.textContent = `${temp}°C`;
+                feelsLikeEl.textContent = `${feels}°C`;
+                humidityEl.textContent = `${hum}%`;
+                windEl.textContent = `${wind} km/h`;
+
+                // Simple WMO code → icon & description
+                let icon = "🌤️", desc = "Clear";
+                if (code >= 1 && code <= 3) { icon = isDay ? "☀️" : "🌙"; desc = "Clear"; }
+                else if (code >= 45 && code <= 48) { icon = "🌫️"; desc = "Fog"; }
+                else if (code >= 51 && code <= 67) { icon = "🌧️"; desc = "Rain"; }
+                else if (code >= 71 && code <= 77) { icon = "❄️"; desc = "Snow"; }
+                else if (code >= 80 && code <= 86) { icon = "🌦️"; desc = "Showers"; }
+                else if (code >= 95) { icon = "⛈️"; desc = "Thunderstorm"; }
+                else { icon = isDay ? "⛅" : "🌥️"; desc = "Cloudy"; }
+
+                weatherIcon.textContent = icon;
+                weatherDesc.textContent = desc;
+
+                // reveal cards with nice timing
+                weatherCard.classList.add('visible');
+                setTimeout(() => avatarRow.classList.add("visible"), 220);
+
+            } catch (err) {
+                console.error(err);
+                weatherDesc.textContent = "Offline or blocked";
+                weatherIcon.textContent = "📡";
+                weatherTemp.textContent = "--°";
+                weatherCard.classList.add('visible');
+                setTimeout(() => avatarRow.classList.add("visible"), 220);
+            }
+
+        }
+        fetchWeather();
+
+        // ─── Particle System ────────────────────────────────────────────────
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let w, h;
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+
+        const particles = [];
+        const count = Math.min(100, Math.floor((w * h) / 8000));
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * w;
+                this.y = Math.random() * h * 1.4 - h * 0.4;
+                this.size = Math.random() * 3 + 0.8;
+                this.speed = Math.random() * 0.5 + 0.2;
+                this.opacity = Math.random() * 0.5 + 0.25;
+                this.hueOffset = Math.random() * 40 - 20;
+                this.life = Math.random() * 400 + 500;
+                this.age = 0;
+            }
+            update() {
+                this.y += this.speed;
+                this.age++;
+                this.opacity = 0.75 * Math.sin((this.age / this.life) * Math.PI);
+                if (this.y > h + 60 || this.age >= this.life) this.reset();
+            }
+            draw() {
+                const hue = getComputedStyle(document.body).getPropertyValue('--accent')?.match(/\d+/)?.[0] || 270;
+                ctx.globalAlpha = this.opacity * 0.95;
+                ctx.fillStyle = `hsl(${parseInt(hue) + this.hueOffset}, 85%, 75%)`;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = `hsl(${parseInt(hue) + this.hueOffset}, 90%, 65%)`;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+                ctx.globalAlpha = this.opacity * 0.3; ctx.shadowBlur = 30; ctx.fill();
+            }
+        }
+        for (let i = 0; i < count; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, w, h);
+            ctx.globalCompositeOperation = 'lighter';
+            particles.forEach(p => { p.update(); p.draw(); });
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // ─── Greeting + Theme Switching ──────────────────────────────────────
+        const greetingText = document.getElementById('greetingText');
+        const timeWord = document.getElementById('timeWord');
+        const buttons = document.querySelectorAll('.btn');
+
+        const greetings = { Morning: "Morning", Afternoon: "Afternoon", Evening: "Evening", Night: "Night" };
+
+        function setGreeting(type) {
+            greetingText.style.animation = 'none';
+            void greetingText.offsetWidth;
+            greetingText.style.animation = 'fadeInUp 1.3s cubic-bezier(0.22,1,0.36,1)';
+
+            timeWord.textContent = greetings[type];
+            applyTheme(type);
+
+            buttons.forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-greeting="${type}"]`).classList.add('active');
+        }
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => setGreeting(btn.dataset.greeting));
+        });
+
+        // Initial setup
+        const initialType = getTimeOfDay();
+        setGreeting(initialType);
+    </script>
+</body>
+
+</html>
